@@ -1,3 +1,5 @@
+## **Evolutionary Algorithms for Global Optimization**
+
 This repository explores global optimization using Evolutionary Algorithms (EA), demonstrating their application in solving computationally hard problems. By engaging with these techniques, one can gain insights into the EA process, its challenges, and the impact of various parameters and selection schemes.
 
 Problems Covered:
