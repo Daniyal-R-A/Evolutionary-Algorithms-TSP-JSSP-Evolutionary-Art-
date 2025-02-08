@@ -115,51 +115,80 @@ class TravelSalesmanProblemSolver:
         Evolve the population over the specified number of generations and iterations.
         """
         avg_bsf = [0 for _ in range(self.no_of_iterations)]
+        avg_fitness = [0 for _ in range(self.no_of_iterations)]
         for iteration in range(self.no_of_iterations):
             population = self.initialize_population()
             bsf = [0 for _ in range(self.no_of_generations)]
+            avg_gen_fitness = [0 for _ in range(self.no_of_generations)]
             for generation in range(self.no_of_generations):
                 offsprings = []
                 for _ in range(self.no_of_offsprings):
-                    parent1, parent2 = EvolutionaryAlgorithmHelper.truncation_selection(population, 2)
+                    parent1, parent2 = EvolutionaryAlgorithmHelper.random_selection(population, 2)
                     offspring = self.crossover(parent1, parent2)
                     offspring = self.mutate(offspring)
                     offsprings.append(offspring)
                 population.extend(offsprings)
-                population = EvolutionaryAlgorithmHelper.truncation_selection(population, self.population_size)
+                population = EvolutionaryAlgorithmHelper.random_selection(population, self.population_size)
                 # Get best fitness from current generation and add to the list
                 bsf[generation] = population[0].fitness
+                avg_gen_fitness[generation] = sum(chromosome.fitness for chromosome in population) / self.population_size
                 if generation == self.no_of_generations - 1: 
                     # Check if the answer is valid
                     s = set(i for i in population[0].genes)
                     if len(s) != len(population[0].genes) and len(s) != len(self.dataset):
                         raise ValueError("Invalid answer")
                     avg_bsf[iteration] = bsf
+                    avg_fitness[iteration] = avg_gen_fitness
         
         for i in range(self.no_of_generations):
             gen_avg_bsf = sum(avg_bsf[j][i] for j in range(self.no_of_iterations)) / self.no_of_iterations
-            print(f"Generation {i + 1}: {gen_avg_bsf}")
+            print(f"Generation {i + 1} Average Best: {gen_avg_bsf}")
+            gen_avg_fitness = sum(avg_fitness[j][i] for j in range(self.no_of_iterations)) / self.no_of_iterations
+            print(f"Generation {i + 1} Average Fitness: {gen_avg_fitness}")
 
+        # *********** Plot the graph for Average Best Fitness ***********
         # Generate X-axis values from 1 to no_of_generations
         x = np.arange(1, self.no_of_generations + 1)
 
         # Compute Y-axis values (gen_avg_bsf) using NumPy
         gen_avg_bsf = np.mean(avg_bsf, axis=0)  # NumPy computes mean along iterations
+        
 
-        # Plot the graph
+        # Plot the graph for Average Best Fitness
         plt.figure(figsize=(12, 6))
         plt.plot(x, gen_avg_bsf, marker='o', markersize=2, linewidth=1, label="Avg Best Fitness")
 
         # Labeling
         plt.xlabel("Generation")
         plt.ylabel("Average Best Fitness")
-        plt.title("TSP using EA - (Truncation and Truncation)")
+        plt.title("TSP using EA - (Random and Random)")
         plt.legend()
         plt.grid(True)
 
         # Optimize visibility for large generation counts
         plt.xticks(np.linspace(1, self.no_of_generations, num=10, dtype=int))  # Show only a few ticks on X-axis
         plt.yticks(np.linspace(min(gen_avg_bsf), max(gen_avg_bsf), num=10))  # Adjust Y-ticks for clarity
+
+        plt.show()
+
+        # *********** Plot the graph for Average Fitness ***********
+        # Compute Y-axis values (avg_fitness) using NumPy
+        avg_fitness = np.mean(avg_fitness, axis=0)  # NumPy computes mean along iterations
+
+        # Plot the graph for Average Fitness
+        plt.figure(figsize=(12, 6))
+        plt.plot(x, avg_fitness, marker='o', markersize=2, linewidth=1, label="Avg Fitness")
+
+        # Labeling
+        plt.xlabel("Generation")
+        plt.ylabel("Average Fitness")
+        plt.title("TSP using EA - (Random and Random)")
+        plt.legend()
+        plt.grid(True)
+
+        # Optimize visibility for large generation counts
+        plt.xticks(np.linspace(1, self.no_of_generations, num=10, dtype=int))
+        plt.yticks(np.linspace(min(avg_fitness), max(avg_fitness), num=10))
 
         plt.show()
 
